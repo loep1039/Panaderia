@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Pan Canilla - Fernando Araujo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* ESQUEMA DE COLORES: ROJO CARMESÍ */
+            --primario-canilla: #dc2626; 
+            --canilla-oscuro: #991b1b;
+            --fondo-gris: #f8faf9;
+            --texto-oscuro: #1a202c;
+            --blanco: #ffffff;
+            --gris-claro: #edf2f7;
+            --canilla-claro: #fef2f2; 
+            --canilla-borde: #fecaca;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e2e8f0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 400px;
+            background: var(--blanco);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .status-bar {
+            font-size: 0.65rem;
+            padding: 8px;
+            text-align: center;
+            background: #f1f5f9;
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .header-card {
+            background-color: var(--primario-canilla);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+            margin: 10px;
+        }
+
+        .header-card p { margin: 0; font-size: 0.65rem; opacity: 0.9; text-transform: uppercase;}
+        .header-card h1 { margin: 5px 0 0; font-size: 1.3rem; letter-spacing: 2px; font-weight: 800; text-transform: uppercase; }
+
+        .input-section {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #a0aec0;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .val-input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid var(--canilla-borde);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #f7fafc;
+            color: var(--texto-oscuro);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px 20px;
+        }
+
+        .card {
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--gris-claro);
+        }
+
+        .card.cost { background-color: var(--canilla-claro); border: 1.5px solid var(--canilla-borde); }
+        .label-mini { font-size: 0.6rem; color: #a0aec0; text-transform: uppercase; font-weight: bold; }
+        .card-val { font-size: 1.1rem; font-weight: bold; display: block; color: var(--texto-oscuro); }
+        .card.cost .label-mini { color: var(--primario-canilla); }
+        .card.cost .card-val { color: var(--canilla-oscuro); }
+
+        .list { padding: 10px 20px; }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .ing-name { font-weight: 700; font-size: 0.85rem; color: var(--texto-oscuro); }
+        .ing-results { text-align: right; }
+        .ing-qty { display: block; font-weight: 700; font-size: 0.9rem; color: var(--texto-oscuro); }
+        .ing-price { font-size: 0.65rem; color: var(--primario-canilla); font-weight: bold; }
+
+        .footer { padding: 20px; text-align: center; }
+        .btn-copy {
+            background-color: var(--primario-canilla);
+            color: white;
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-size: 0.8rem;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+        }
+        .btn-copy:hover { background-color: var(--canilla-oscuro); }
+    </style>
+</head>
+<body>
+
+<div class="phone-container">
+    <div id="status" class="status-bar"><i class="fas fa-sync fa-spin"></i> Conectando a Google Sheets...</div>
+    
+    <div class="header-card">
+        <p>SISTEMA DE GESTIÓN - FERNANDO ARAUJO</p>
+        <h1>PAN CANILLA</h1>
+    </div>
+
+    <div class="input-section">
+        <div class="input-group">
+            <label>Cantidad de Panes a Producir</label>
+            <input type="number" id="cantidad" class="val-input" value="1" oninput="calcular()">
+        </div>
+    </div>
+
+    <div class="summary">
+        <div class="card cost">
+            <span class="label-mini">Costo Insumos</span>
+            <span id="resCosto" class="card-val">$ 0.00</span>
+        </div>
+        <div class="card">
+            <span class="label-mini">Masa Total</span>
+            <span id="resMasa" class="card-val">0 g</span>
+        </div>
+    </div>
+
+    <div class="list" id="listaIngredientes"></div>
+
+    <div class="footer">
+        <button class="btn-copy" onclick="copiarAlPortapapeles()">
+            <i class="fab fa-whatsapp"></i> Copiar para WhatsApp
+        </button>
+    </div>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyK0o_LRZg2b75mrPzU63l6bPjFac01LWs3DA5tFVXJ3yR97DbBek1zEVD7JJySiDas/exec";
+
+    const RECETA = {
+        nombre: "Pan Canilla",
+        gramosPorUnidad: 301.0, // Peso total según tu tabla
+        items: [
+            { nombre: "Harina", pct: 100.0, precioKg: 0 },
+            { nombre: "Agua", pct: 54.5, precioKg: 0 },
+            { nombre: "Levadura", pct: 1.7, precioKg: 0 },
+            { nombre: "Sal", pct: 2.0, precioKg: 0 },
+            { nombre: "Azúcar", pct: 8.0, precioKg: 0 },
+            { nombre: "Margarina", pct: 8.0, precioKg: 0 },
+            { nombre: "Vainilla", pct: 0.8, precioKg: 0 }
+        ]
+    };
+
+    async function sincronizarPrecios() {
+        try {
+            const response = await fetch(WEB_APP_URL);
+            const data = await response.json();
+            RECETA.items.forEach(ing => {
+                const encontrado = data.find(p => p.nombre.toLowerCase().trim() === ing.nombre.toLowerCase());
+                if (encontrado) ing.precioKg = encontrado.precioKg;
+            });
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Precios actualizados';
+            statusEl.style.color = "#dc2626";
+            calcular();
+        } catch (e) { 
+            document.getElementById('status').innerText = "○ Error: Usando precios base"; 
+            calcular(); 
+        }
+    }
+
+    function calcular() {
+        const unidades = parseFloat(document.getElementById('cantidad').value) || 0;
+        const harinaBase = (RECETA.gramosPorUnidad * unidades) / (1 + (54.5+1.7+2.0+8.0+8.0+0.8)/100);
+        
+        const contenedor = document.getElementById('listaIngredientes');
+        contenedor.innerHTML = '';
+        let masaTotal = 0;
+        let costoTotal = 0;
+
+        RECETA.items.forEach(ing => {
+            const gramos = harinaBase * (ing.pct / 100);
+            
+            // LÓGICA DE HUEVOS (Aunque esta receta no lleva, queda lista por si agregas)
+            let divisor = (ing.nombre === "Huevos") ? 1500 : 1000;
+            const costo = (gramos / divisor) * ing.precioKg;
+            
+            masaTotal += gramos;
+            costoTotal += costo;
+
+            contenedor.innerHTML += `
+                <div class="item">
+                    <span class="ing-name">${ing.nombre} <small style="color:#a0aec0; font-weight:normal">(${ing.pct}%)</small></span>
+                    <div class="ing-results">
+                        <span class="ing-qty">${gramos.toFixed(1)} g</span>
+                        <span class="ing-price">$ ${costo.toFixed(3)}</span>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('resMasa').innerText = `${masaTotal.toFixed(0)} gr`;
+        document.getElementById('resCosto').innerText = `$ ${costoTotal.toFixed(2)}`;
+    }
+
+    function copiarAlPortapapeles() {
+        const cant = document.getElementById('cantidad').value;
+        const masa = document.getElementById('resMasa').innerText;
+        const costo = document.getElementById('resCosto').innerText;
+        let texto = `*GESTIÓN PAN CANILLA*\n--------------------------\nCANTIDAD: ${cant} panes\nCOSTO TOTAL: ${costo}\nMASA TOTAL: ${masa}\n\n*DETALLE:*\n`;
+        
+        const harinaBase = (RECETA.gramosPorUnidad * cant) / (1 + (54.5+1.7+2.0+8.0+8.0+0.8)/100);
+        RECETA.items.forEach(ing => {
+            const gramos = harinaBase * (ing.pct / 100);
+            texto += `- ${ing.nombre}: ${gramos.toFixed(1)}g\n`;
+        });
+
+        const el = document.createElement('textarea');
+        el.value = texto; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el);
+        alert("Copiado para enviar por WhatsApp");
+    }
+
+    window.onload = sincronizarPrecios;
+</script>
+</body>
+</html>
